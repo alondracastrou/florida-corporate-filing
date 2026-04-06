@@ -8,10 +8,21 @@ A CLI tool that downloads daily corporate filing data from the Florida Division 
 2. Downloads daily filing files for your selected date range
 3. Parses the fixed-width text records (corp info, addresses, officers, registered agents)
 4. Normalizes the data (date formatting, address cleanup, name parsing, zip code formatting)
-5. Filters by entity type (LLC, Domestic Profit, Foreign Corp, etc.) and active/inactive status
-6. Sorts results by file date (newest first)
-7. Exports to Excel (.xlsx), CSV, or JSON
-8. Automatically opens the output file when done
+5. Filters to only **brand-new incorporations** — annual reports, amendments, reinstatements, and registered agent changes are excluded
+6. Excludes records where the primary officer is another company or is missing entirely — only businesses with a real person as Officer 1 are included
+7. Filters by entity type (LLC, Domestic Profit, Foreign Corp, etc.) and active/inactive status
+8. Sorts results by file date (newest first)
+9. Exports to Excel (.xlsx), CSV, or JSON
+10. Automatically opens the output file when done
+
+## Filtering Logic
+
+Records must pass all of the following to be included in the output:
+
+- **New formations only**: Records with a populated Last Transaction Date or Annual Report Year are skipped. Per the FL Division of Corporations data definitions, the File Date field is the "file date of the formation filing" — it reflects the original incorporation date, not subsequent filings.
+- **Person as primary officer**: Officer 1 must have a type of `P` (Person). Records where Officer 1 is a corporation (`C`) or has no officer listed are excluded.
+- **Entity type**: Must match one of the selected entity types (e.g., DOMP, FLAL).
+- **Active status**: When active-only mode is on (default), only records with status `A` are included.
 
 ## Requirements
 
@@ -112,6 +123,10 @@ bun start -- --dry-run --days 30
 | `registeredAgent`    | RA name, address, city, state, zip                    |
 | `officer1`           | Primary officer title, name, first/last name, address |
 | `additionalOfficers` | All other officers (combined into one field)          |
+
+## Data Source
+
+Records are sourced from the FL Division of Corporations public SFTP server. The daily Corporate Data Files use a fixed-width format (1440 characters per record) as defined in the [Corporate File Definitions](https://dos.sunbiz.org/data-definitions/cor.html). Each officer entry includes a Type field — `P` for Person, `C` for Corporation — which is used to filter out company-managed entities.
 
 ## Output
 

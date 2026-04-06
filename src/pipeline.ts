@@ -41,7 +41,17 @@ export async function runPipeline(
     const rawRecords = parseFileFromBuffer(file.buffer);
     totalParsed += rawRecords.length;
 
-    const normalized = rawRecords.map(normalizeRecord);
+    // Pre-filter: only new incorporations with a person as officer 1
+    const qualified = rawRecords.filter((r) => {
+      // Skip if not a new formation (has prior transactions or annual reports)
+      if (r.lastTransDate.trim() || r.reportYear1.trim()) return false;
+      // Skip if officer 1 is not a person
+      const o1 = r.officers[0];
+      if (!o1 || o1.type.trim() !== "P") return false;
+      return true;
+    });
+
+    const normalized = qualified.map(normalizeRecord);
     allRecords.push(...normalized);
 
     callbacks?.onParseProgress?.(file.filename, rawRecords.length);

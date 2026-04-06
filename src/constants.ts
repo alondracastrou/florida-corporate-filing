@@ -121,10 +121,16 @@ export const FIELD_GROUP_OPTIONS: { value: FieldGroupKey; label: string }[] = Ob
   label: group.label,
 }));
 
-export const DEFAULT_ENTITY_TYPES: EntityType[] = ["DOMP", "FLAL"];
+export const DEFAULT_ENTITY_TYPES: EntityType[] = [
+  "DOMP", "FLAL", "FORP", "FORNP", "DOMNP", "DOMLP", "FORLP",
+];
 
 export const DEFAULT_FIELD_GROUPS: FieldGroupKey[] = [
   "filingInfo",
+  "feiNumber",
   "principalAddress",
+  "mailAddress",
+  "registeredAgent",
   "officer1",
+  "additionalOfficers",
 ];
